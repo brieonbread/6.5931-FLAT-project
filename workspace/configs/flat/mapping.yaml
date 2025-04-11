@@ -1,132 +1,109 @@
-type: fused
-nodes:
--type: storage
-target: 0 # MainMemory/DRAM
-dspace: [Q, K, V, O] # Exclude L and A, to reduce memory traffic
-
-
--type: temporal # Tiling Q, K, V, L, A, O by size Bx, Hx, and Nx.
-rank: B1
-tile_shape: 256 # TODO - we need to define tile size
--type: temporal 
-rank: H1
-tile_shape: 256
--type: temporal 
-rank: M1
-tile_shape: 256 # - 256 # The goal of tiling
-
--type: storage # store tiles of all tensors in SRAM
-target: 1 # GlobalBuffer/SRAM
-dspace: [Q, K, V, O, L, A]
-
--type: sequential
-branches:
-
-# Now, branches for each layer (QK).
-# The amount of data sent to the PEs must be <= meshX * meshY. 
-- - type: temporal
+mapping:
+  type: fused
+  nodes:
+  - type: storage
+    target: 0 
+    dspace: [Q, K, L] 
+  - type: temporal 
     rank: B1
-    tile_shape: 1 
-- - type: temporal
+    tile_shape: 256
+  - type: temporal 
     rank: H1
-    tile_shape: 1 
-
-# Bringing the weight-stationary matrix into the correct tile to be distributed through the PEs
-- - type: temporal
-    rank: E1
     tile_shape: 256
-- - type: temporal
-    rank: P1
+  - type: temporal 
+    rank: M1
     tile_shape: 256
+  - type: storage 
+    target: 1 
+    dspace: [Q, K, L]
+  - type: sequential
+    branches:
+    # Now, branches for each layer (QK).
+    # The amount of data sent to the PEs must be <= meshX * meshY. 
+    - - type: temporal
+        rank: B1
+        tile_shape: 1 
+      - type: temporal
+        rank: H1
+        tile_shape: 1 
+      - type: temporal
+        rank: E1
+        tile_shape: 256
+      - type: temporal
+        rank: P1
+        tile_shape: 256
+      - type: spatial
+        rank: E1 
+        tile_shape: 1
+      - type: spatial
+        rank: P1 
+        tile_shape: 1 
+      - type: storage
+        target: 3
+        dspace: [K] 
+      - type: temporal
+        rank: M1
+        tile_shape: 1
 
-# Qtile: Bx, Hx, Mx, Ex
-# Ktile: Bx, Hx, Px, Ex
-# Ltile: Bx, Hx, Mx, Px	
-
-- type: spatial # for (0, 256, 1) spatial
-  rank: E1 # enables output reuse (prevents reloading space)
-  tile_shape: 1
-- type: spatial
-  rank: P1 # Enables input reuse, so we can apply to the weights along the column
-  tile_shape: 1 
-
-- type: storage
-  target: PEWeightStorage
-  dspace: [K]  # 1 * 1 * P * Ex
-
-- type: temporal # for (0, 256, 1) spatial
-  rank: M1 # enables output reuse (prevents reloading space)
-  tile_shape: 1
-
-- type: compute
-  einsum: QK
-  target: 2
+      - type: compute
+        einsum: QK
+        target: 2
 
 # ——————————————————————————————————————
 
-# Branch for softmax
-- - type: temporal
-    rank: B2
-    tile_shape: 1 
-- - type: temporal
-    rank: H2
-    tile_shape: 1 
-- - type: temporal
-    rank: M2
-    tile_shape: 256
-- - type: temporal
-    rank: P2
-    tile_shape: 256
+# # Branch for softmax
+#     - - type: temporal
+#         rank: B2
+#         tile_shape: 1 
+#       - type: temporal
+#         rank: H2
+#         tile_shape: 1 
+#       - type: temporal
+#         rank: M2
+#         tile_shape: 256
+#       - type: temporal
+#         rank: P2
+#         tile_shape: 256
+#       - type: spatial
+#         rank: M2
+#         tile_shape: 1
+#       - type: spatial
+#         rank: P2
+#         tile_shape: 1
+#       - type: storage
+#         target: 3
+#         dspace: [L]
+#       - type: compute
+#         einsum: SM
+#         target: 2
 
-- -type: spatial
- rank: M2
-tile_shape: 1
-- -type: spatial
- rank: P2
-tile_shape: 1
-
-- type: storage
-  target: PEWeightStorage
-  dspace: [L]
-
-
--type: compute
- einsum: SM
- target: 2
-
-# —————————————————————————————
-# Branch for AV
-# The amount of data sent to the PEs must be <= meshX * meshY. 
-- - type: temporal
-    rank: B3
-    tile_shape: 1 
-- - type: temporal
-    rank: H3
-    tile_shape: 1 
-
-# Bringing the weight-stationary matrix into the correct tile to be distributed through the PEs
-- - type: temporal
-    rank: F3
-    tile_shape: 256
-- - type: temporal
-    rank: P3
-    tile_shape: 256
-
-- type: spatial
-  rank: F3 # enables output reuse (partial summing along a column of V^T)
-  tile_shape: 1
-- type: spatial
-  rank: P3 # Enables input reuse, so we can apply to the weights along the column
-  tile_shape: 1 
-
-- type: storage
-  target: PEWeightStorage
-  dspace: [V]
-
-- type: temporal 
-  rank: M3
-  tile_shape: 1
-
--type: compute
- einsum: AV
- target: 2
+# # —————————————————————————————
+# # Branch for AV
+# # The amount of data sent to the PEs must be <= meshX * meshY. 
+#     - - type: temporal
+#         rank: B3
+#         tile_shape: 1 
+#       - type: temporal
+#         rank: H3
+#         tile_shape: 1 
+#       - type: temporal
+#         rank: F3
+#         tile_shape: 256
+#       - type: temporal
+#         rank: P3
+#         tile_shape: 256
+#       - type: spatial
+#         rank: F3 
+#         tile_shape: 1
+#       - type: spatial
+#         rank: P3 
+#         tile_shape: 1 
+#       - type: storage
+#         target: 3
+#         dspace: [V]
+#       - type: temporal 
+#         rank: M3
+#         tile_shape: 1
+#       - type: compute
+#         einsum: AV
+#         target: 2

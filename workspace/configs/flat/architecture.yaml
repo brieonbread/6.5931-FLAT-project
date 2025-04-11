@@ -1,51 +1,38 @@
 variables:
- global_cycle_seconds: 1e-9 # 1 / 0.7 GHz = 1.43 ns
- technology: "45nm"
+  global_cycle_seconds: 1e-9 # 1 / 0.7 GHz = 1.43 ns
+  technology: "45nm"
 
 architecture:
- version: 0.4
- nodes:
- - !Component
-   name: MainMemory
-   class: DRAM # off chip memory
-   attributes: # do we have to set depth for off chip?
-        width: 3200 # where do we find a value for this?
-       word_bits: 16
-       datawidth: 16
-       shared_bandwidth: 200 # words per cycle @ 10^9 cycles/s = 400 GB/s bandwidth
-   required_actions: ['read', 'write']
- - !Component
-   name: GlobalBuffer
-   class: SRAM 
-   attributes:  # does the depth/width/blksz matter as long as the capacity is right?
-       depth: 65536 # 4096 bits per row × 65536 rows = 32MB total
-       width: 4096 # Number of bits per row (256 words × 16 bits)
-       block_size: 256 # 256 words per row
-       word_bits: 16 # Each word is 16 bits (2 bytes)
-       datawidth: 16 
-       n_rdwr_ports: 4 # Where do we find a value for this?
-       shared_bandwidth: 4000  # words per cycle @ 1ns cycle time = 8 TB/s total bandwidth
-   required_actions: ['read', 'write']
- - !Container
-   name: PE
-   spatial:
-   meshX: 256
-   meshY: 256
- - !Component
-   name: PEWeightReg
-   class: regfile
-   attributes:
-       depth: 16
-       width: 16
-
- - !Component
-   name: PECompute
-   class: fpmac
-   attributes:
+  version: 0.4
+  nodes:
+  - !Component
+    name: MainMemory
+    class: DRAM
+    attributes: {width: 3200, word_bits: 16, datawidth: 16, shared_bandwidth: 200}
+    required_actions: ['read', 'write']
+  - !Component
+    name: GlobalBuffer
+    class: SRAM 
+    attributes:  {depth: 65536, width: 4096, block_size: 256, word_bits: 16, datawidth: 16, n_rdwr_ports: 4, shared_bandwidth: 4000 }
+    required_actions: ['read', 'write']
+  - !Container
+    name: PE
+    spatial:
+      meshX: 256
+      meshY: 256
+  - !Component
+    name: PEWeightStorage
+    class: regfile
+    attributes: { depth: 16, datawidth: 16, width: 16, n_rdwr_ports: 4}
+    required_actions: ['read', 'write']
+  - !Component
+    name: MACC
+    class: fpmac
+    attributes: 
        datawidth: 16
        width: 16
        cycle_time: 1e-9
-   required_actions: ['compute']
+    required_actions: ['compute']
 
 
 
