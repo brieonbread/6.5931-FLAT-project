@@ -3,19 +3,19 @@ mapping:
   nodes:
   - type: storage
     target: 0 
-    dspace: [Q, K, L] 
+    dspace: [Q, K] 
   - type: temporal 
     rank: B1
-    tile_shape: 256
+    tile_shape: 64
   - type: temporal 
     rank: H1
-    tile_shape: 256
+    tile_shape: 12
   - type: temporal 
     rank: M1
-    tile_shape: 256
+    tile_shape: 512
   - type: storage 
     target: 1 
-    dspace: [Q, K, L]
+    dspace: [Q, K, L, A]
   - type: sequential
     branches:
     # Now, branches for each layer (QK).
@@ -39,71 +39,62 @@ mapping:
         rank: P1 
         tile_shape: 1 
       - type: storage
-        target: 3
+        target: 2
         dspace: [K] 
       - type: temporal
         rank: M1
         tile_shape: 1
-
       - type: compute
         einsum: QK
+        target: 3
+    - - type: temporal
+        rank: B2
+        tile_shape: 1 
+      - type: temporal
+        rank: H2
+        tile_shape: 1 
+      - type: temporal
+        rank: M2
+        tile_shape: 256
+      - type: temporal
+        rank: P2
+        tile_shape: 256
+      - type: spatial
+        rank: M2
+        tile_shape: 1
+      - type: spatial
+        rank: P2
+        tile_shape: 1
+      - type: storage
         target: 2
-
-# ——————————————————————————————————————
-
-# # Branch for softmax
-#     - - type: temporal
-#         rank: B2
-#         tile_shape: 1 
-#       - type: temporal
-#         rank: H2
-#         tile_shape: 1 
-#       - type: temporal
-#         rank: M2
-#         tile_shape: 256
-#       - type: temporal
-#         rank: P2
-#         tile_shape: 256
-#       - type: spatial
-#         rank: M2
-#         tile_shape: 1
-#       - type: spatial
-#         rank: P2
-#         tile_shape: 1
-#       - type: storage
-#         target: 3
-#         dspace: [L]
-#       - type: compute
-#         einsum: SM
-#         target: 2
-
-# # —————————————————————————————
-# # Branch for AV
-# # The amount of data sent to the PEs must be <= meshX * meshY. 
-#     - - type: temporal
-#         rank: B3
-#         tile_shape: 1 
-#       - type: temporal
-#         rank: H3
-#         tile_shape: 1 
-#       - type: temporal
-#         rank: F3
-#         tile_shape: 256
-#       - type: temporal
-#         rank: P3
-#         tile_shape: 256
-#       - type: spatial
-#         rank: F3 
-#         tile_shape: 1
-#       - type: spatial
-#         rank: P3 
-#         tile_shape: 1 
-#       - type: storage
-#         target: 3
-#         dspace: [V]
-#       - type: temporal 
-#         rank: M3
-#         tile_shape: 1
-#       - type: compute
-#         einsum: AV
-#         target: 2
+        dspace: [L]
+      - type: compute
+        einsum: SM
+        target: 3
+    # - - type: temporal
+    #     rank: B3
+    #     tile_shape: 1 
+    #   - type: temporal
+    #     rank: H3
+    #     tile_shape: 1 
+    #   - type: temporal
+    #     rank: F3
+    #     tile_shape: 256
+    #   - type: temporal
+    #     rank: P3
+    #     tile_shape: 256
+    #   - type: spatial
+    #     rank: F3 
+    #     tile_shape: 1
+    #   - type: spatial
+    #     rank: P3 
+    #     tile_shape: 1 
+    #   - type: storage
+    #     target: 2
+    #     dspace: [V]
+    #   - type: temporal 
+    #     rank: M3
+    #     tile_shape: 1
+    #   - type: compute
+    #     einsum: AV
+    #     target: 3

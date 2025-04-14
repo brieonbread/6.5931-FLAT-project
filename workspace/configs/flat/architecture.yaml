@@ -1,7 +1,7 @@
 variables:
-  global_cycle_seconds: 1e-9 # 1 / 0.7 GHz = 1.43 ns
+  global_cycle_seconds: 1e-9
   technology: "45nm"
-
+  
 architecture:
   version: 0.4
   nodes:
@@ -17,6 +17,9 @@ architecture:
     required_actions: ['read', 'write']
   - !Container
     name: PE
+    attributes: # had to add this for some reason
+      width: 16
+      datawidth: 16
     spatial:
       meshX: 256
       meshY: 256
@@ -31,6 +34,8 @@ architecture:
     attributes: 
        datawidth: 16
        width: 16
+       exponent: 5
+       mantissa: 10
        cycle_time: 1e-9
     required_actions: ['compute']
 
