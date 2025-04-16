@@ -3,18 +3,18 @@ mapping:
   nodes:
   - type: storage
     target: 0 
-    dspace: [Q, K] 
+    dspace: [Q, K, V, O]
   - type: temporal 
-    rank: B1
+    rank: B3
     tile_shape: 64
   - type: temporal 
-    rank: H1
+    rank: H3
     tile_shape: 12
   - type: temporal 
-    rank: M1
+    rank: M3
     tile_shape: 512
   - type: storage 
-    target: 1 
+    target: 1
     dspace: [Q, K, L, A]
   - type: sequential
     branches:
@@ -71,30 +71,30 @@ mapping:
       - type: compute
         einsum: SM
         target: 3
-    # - - type: temporal
-    #     rank: B3
-    #     tile_shape: 1 
-    #   - type: temporal
-    #     rank: H3
-    #     tile_shape: 1 
-    #   - type: temporal
-    #     rank: F3
-    #     tile_shape: 256
-    #   - type: temporal
-    #     rank: P3
-    #     tile_shape: 256
-    #   - type: spatial
-    #     rank: F3 
-    #     tile_shape: 1
-    #   - type: spatial
-    #     rank: P3 
-    #     tile_shape: 1 
-    #   - type: storage
-    #     target: 2
-    #     dspace: [V]
-    #   - type: temporal 
-    #     rank: M3
-    #     tile_shape: 1
-    #   - type: compute
-    #     einsum: AV
-    #     target: 3
+    - - type: temporal
+        rank: B3
+        tile_shape: 1 
+      - type: temporal
+        rank: H3
+        tile_shape: 1 
+      - type: temporal
+        rank: F3
+        tile_shape: 256
+      - type: temporal
+        rank: P3
+        tile_shape: 256
+      - type: spatial
+        rank: F3 
+        tile_shape: 1
+      - type: spatial
+        rank: P3 
+        tile_shape: 1 
+      - type: storage
+        target: 2
+        dspace: [V]
+      - type: temporal 
+        rank: M3
+        tile_shape: 1
+      - type: compute
+        einsum: AV
+        target: 3

@@ -8,7 +8,7 @@ architecture:
   - !Component
     name: MainMemory
     class: DRAM
-    attributes: {width: 3200, word_bits: 16, datawidth: 16, shared_bandwidth: 200}
+    attributes: {depth: 2500000, width: 3200, word_bits: 16, datawidth: 16, shared_bandwidth: 200}
     required_actions: ['read', 'write']
   - !Component
     name: GlobalBuffer
