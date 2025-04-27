@@ -1,0 +1,51 @@
+problem:
+  - shape:
+      name: QK
+      dimensions: [ B1, H1, M1, P1, E1 ]
+      data_spaces:
+      - name: Q
+        dimensions: [ Q_B, Q_H, Q_M, Q_E ]
+        projection: '[ B1, H1, M1, E1 ]'
+      - name: K
+        dimensions: [ K_B, K_H, K_P, K_E ]
+        projection: '[ B1, H1, P1, E1 ]'
+      - name: L
+        dimensions: [ L_B, L_H, L_M, L_P ]
+        projection: '[ B1, H1, M1, P1 ]'
+        read_write: True
+
+    instance: >-
+      0 <= B1 < 64 and 0 <= H1 < 12 and 0 <= M1 < 512 and 0 <= P1 < 512 and 0 <= E1 < 64
+
+  # - shape:
+  #     name: SM
+  #     dimensions: [ B2, H2, M2, P2 ]
+  #     data_spaces:
+  #     - name: L
+  #       dimensions: [ L_B, L_H, L_M, L_P ]
+  #       projection: '[ B2, H2, M2, P2 ]'
+  #     - name: A
+  #       dimensions: [ A_B, A_H, A_M, A_P ]
+  #       projection: '[ B2, H2, M2, P2 ]'
+  #       read_write: True
+
+  #   instance: >-
+  #     0 <= B2 < 64 and 0 <= H2 < 12 and 0 <= M2 < 512 and 0 <= P2 < 512
+
+  - shape:
+      name: AV
+      dimensions: [ B3, H3, M3, P3, F3 ]
+      data_spaces:
+      - name: L
+        dimensions: [ A_B, A_H, A_M, A_P ]
+        projection: '[ B3, H3, M3, P3 ]'
+      - name: V
+        dimensions: [ V_B, V_H, V_P, V_F ]
+        projection: '[ B3, H3, P3, F3 ]'
+      - name: O
+        dimensions: [ O_B, O_H, O_M, O_F ]
+        projection: '[ B3, H3, M3, F3 ]'
+        read_write: True
+
+    instance: >-
+      0 <= B3 < 64 and 0 <= H3 < 12 and 0 <= M3 < 512 and 0 <= P3 < 512 and 0 <= F3 < 64

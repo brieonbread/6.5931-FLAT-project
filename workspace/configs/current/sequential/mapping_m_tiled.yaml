@@ -1,0 +1,83 @@
+mapping:
+  type: fused
+  nodes:
+  - type: storage
+    target: 0 
+    dspace: [Q, K, V, O]
+  - type: temporal 
+    rank: B3
+    tile_shape: 1
+  - type: temporal 
+    rank: H3
+    tile_shape: 1
+  - type: temporal 
+    rank: M3
+    tile_shape: 64
+  - type: storage 
+    target: 1
+    dspace: [Q, K, L]
+    
+  - type: sequential
+    branches:
+    - - type: temporal
+        rank: E1
+        tile_shape: 256
+      - type: temporal
+        rank: P1
+        tile_shape: 256
+      - type: spatial
+        rank: E1 
+        tile_shape: 1
+      - type: spatial
+        rank: P1 
+        tile_shape: 1 
+      - type: storage
+        target: 2
+        dspace: [K] 
+      - type: temporal
+        rank: M1
+        tile_shape: 1
+      - type: compute
+        einsum: QK
+        target: 3
+        
+    # - - type: temporal
+    #     rank: M2
+    #     tile_shape: 256
+    #   - type: temporal
+    #     rank: P2
+    #     tile_shape: 256
+    #   - type: spatial
+    #     rank: M2
+    #     tile_shape: 1
+    #   - type: spatial
+    #     rank: P2
+    #     tile_shape: 1
+    #   - type: storage
+    #     target: 2
+    #     dspace: [L]
+    #   - type: compute
+    #     einsum: SM
+    #     target: 3
+        
+    - - type: temporal
+        rank: F3
+        tile_shape: 256
+      - type: temporal
+        rank: P3
+        tile_shape: 256
+      - type: spatial
+        rank: F3 
+        tile_shape: 1
+      - type: spatial
+        rank: P3 
+        tile_shape: 1 
+      - type: storage
+        target: 2
+        dspace: [V]
+      - type: temporal 
+        rank: M3
+        tile_shape: 1
+      - type: compute
+        einsum: AV
+        target: 3
