@@ -13,7 +13,7 @@ architecture:
   - !Component
     name: GlobalBuffer
     class: SRAM 
-    attributes:  {depth: 65536, width: 4096, block_size: 256, word_bits: 16, datawidth: 16, n_rdwr_ports: 4, shared_bandwidth: 4000 }
+    attributes:  {depth: 4000, width: 64000, block_size: 256, word_bits: 16, datawidth: 16, n_rdwr_ports: 4, shared_bandwidth: 4000 }
     required_actions: ['read', 'write']
   - !Container
     name: PE

@@ -15,7 +15,7 @@ mapping:
     tile_shape: 512
   - type: storage 
     target: 1
-    dspace: [Q, K, L]
+    dspace: [Q, K, V, L]
     
   - type: pipeline
     branches:

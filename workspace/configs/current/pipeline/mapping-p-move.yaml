@@ -10,20 +10,20 @@ mapping:
   - type: temporal 
     rank: H3
     tile_shape: 1
+  - type: temporal
+    rank: P3
+    tile_shape: 256
   - type: temporal 
     rank: M3
-    tile_shape: 64
+    tile_shape: 512
   - type: storage 
     target: 1
-    dspace: [Q, K, V, L]
+    dspace: [Q, K, L]
     
-  - type: sequential
+  - type: pipeline
     branches:
     - - type: temporal
         rank: E1
-        tile_shape: 256
-      - type: temporal
-        rank: P1
         tile_shape: 256
       - type: spatial
         rank: E1 
@@ -62,9 +62,6 @@ mapping:
         
     - - type: temporal
         rank: F3
-        tile_shape: 256
-      - type: temporal
-        rank: P3
         tile_shape: 256
       - type: spatial
         rank: F3 
